@@ -1,0 +1,24 @@
+{
+  "name": "Predio La Cruz",
+  "short_name": "Predio La Cruz",
+  "description": "Sistema de gestión para canchas de fútbol",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#070a09",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://z-cdn-media.chatglm.cn/files/cc2c2182-32f9-48b6-bf8b-d9aa1aab8b96.png?auth_key=1872968826-e1a55439cbd24fe8bf1ae824f7e94bb3-0-825b987c16d6925ce4cbf6e093e6f349",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://z-cdn-media.chatglm.cn/files/cc2c2182-32f9-48b6-bf8b-d9aa1aab8b96.png?auth_key=1872968826-e1a55439cbd24fe8bf1ae824f7e94bb3-0-825b987c16d6925ce4cbf6e093e6f349",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
