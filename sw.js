@@ -1,34 +1,10 @@
-const CACHE_NAME = 'predio-la-cruz-v1';
-const urlsToCache = [
-  '/',
-  '/index.html'
-];
+const CACHE_NAME = 'predio-v1';
+const ASSETS = ['index.html', 'icon.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting())
-  );
-});
-
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.filter(cacheName => cacheName !== CACHE_NAME)
-          .map(cacheName => caches.delete(cacheName))
-      );
-    })
-  );
+  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request)
-      .then(response => {
-        if (response) return response;
-        return fetch(e.request);
-      })
-  );
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
 });
