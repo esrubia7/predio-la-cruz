@@ -97,6 +97,72 @@
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border-color); }
         th { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); }
         .btn-del { background: #b91c1c; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+
+        /* ===== INTRO ANIMADO ===== */
+#intro {
+  position: fixed;
+  inset: 0;
+  background: #070a09;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeOutIntro 0.5s ease 3.2s forwards;
+}
+
+.logo-container {
+  position: relative;
+  width: 140px;
+  animation: zoomIntro 1.2s ease forwards;
+}
+
+.intro-logo {
+  width: 100%;
+  border-radius: 50%;
+  filter: blur(10px);
+  opacity: 0;
+  animation: focusIntro 1s ease forwards 0.3s, glowIntro 1s ease 2s;
+}
+
+/* Línea scan */
+.scan {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  animation: scanIntro 1s ease 1.2s;
+}
+
+/* Animaciones */
+@keyframes focusIntro {
+  to { filter: blur(0); opacity: 1; }
+}
+
+@keyframes zoomIntro {
+  from { transform: scale(0.8); }
+  to { transform: scale(1); }
+}
+
+@keyframes scanIntro {
+  0% { top: 20%; left: -100%; }
+  50% { left: 100%; }
+  100% { top: 80%; left: 100%; }
+}
+
+@keyframes glowIntro {
+  0% { filter: drop-shadow(0 0 0px var(--accent-cyan)); }
+  50% { filter: drop-shadow(0 0 15px var(--accent-cyan)); }
+  100% { filter: drop-shadow(0 0 0px var(--accent-cyan)); }
+}
+
+@keyframes fadeOutIntro {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+        }
     </style>
 </head>
 <body>
