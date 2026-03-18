@@ -551,6 +551,7 @@
             datos.cortes.forEach(c => csv += `Corte,${c.cancha},${c.fecha},${c.obs}\n`);
             datos.tareas.forEach(t => csv += `Tarea,${t.cancha},${t.fecha},${t.obs}\n`);
             
+            
             const blob = new Blob([csv], {type: 'text/csv'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
@@ -562,6 +563,13 @@
         document.getElementById('fechaR').value = new Date().toISOString().slice(0, 16);
         document.getElementById('fechaC').value = new Date().toISOString().slice(0, 16);
         document.getElementById('fechaT').value = new Date().toISOString().slice(0, 16);
+
+        // INTRO REMOVE
+setTimeout(() => {
+    const intro = document.getElementById("intro");
+    if (intro) intro.remove();
+}, 4000);
+        
     </script>
 </body>
     </html>
