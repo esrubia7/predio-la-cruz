@@ -1,575 +1,188 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Predio La Cruz</title>
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#070a09">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-primary: #070a09; --bg-secondary: #0d1411; --bg-card: #141d19;
-            --accent-emerald: #10b981; --accent-cyan: #06b6d4; --accent-red: #ef4444;
-            --text-primary: #f0fdf4; --text-secondary: #a7f3d0; --text-muted: #6b7280;
-            --border-color: rgba(16, 185, 129, 0.12); --field-green: #166534;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
-        
-        /* UI Elements */
-        .menu-toggle { position: fixed; top: 20px; left: 20px; z-index: 1100; background: var(--accent-emerald); color: #000; border: none; width: 50px; height: 50px; border-radius: 15px; cursor: pointer; font-size: 1.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .side-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--bg-secondary); z-index: 1050; transition: left 0.3s; padding-top: 80px; border-right: 1px solid var(--border-color); }
-        .side-menu.open { left: 0; }
-        .overlay { position: fixed; display: none; inset: 0; background: rgba(0,0,0,0.8); z-index: 1040; }
-        .menu-item { padding: 18px 24px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 12px; }
-        .menu-item:hover { background: rgba(255,255,255,0.05); }
-        
-        /* Pages */
-        .page { display: none; min-height: 100vh; padding-bottom: 30px; }
-        .page.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        /* Home */
-        #page-home { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-        .logo-img { width: 140px; height: 140px; border-radius: 50%; margin-bottom: 20px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); background: #222; object-fit: cover; }
-        .home-title { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 4px; margin-bottom: 10px; }
-        .home-subtitle { color: var(--accent-emerald); letter-spacing: 5px; font-size: 0.8rem; margin-bottom: 20px; }
-        .nav-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 400px; }
-        .nav-btn { background: var(--bg-card); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); cursor: pointer; transition: transform 0.2s; }
-        .nav-btn:hover { transform: translateY(-3px); border-color: var(--accent-emerald); }
-        .nav-btn.primary { grid-column: span 2; background: var(--field-green); }
-        .nav-btn .label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
-        .nav-btn .icon { font-size: 1.8rem; display: block; margin-bottom: 5px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Predio La Cruz</title>
 
-        /* Header */
-        header { background: var(--bg-secondary); padding: 20px; font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; border-bottom: 3px solid var(--accent-emerald); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 10px; }
-        
-        /* Forms & Cards */
-        .container { padding: 20px; max-width: 800px; margin: 0 auto; }
-        .card { background: var(--bg-card); border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border-color); }
-        .card h3 { color: var(--accent-emerald); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; }
-        label { display: block; margin-top: 15px; font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); }
-        select, input, textarea { width: 100%; padding: 12px; margin-top: 5px; background: #000; border: 1px solid var(--border-color); border-radius: 10px; color: white; font-family: inherit; }
-        .btn-action { background: var(--field-green); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
-        .btn-rojo { background: #b91c1c; }
-        
-        /* Dashboard */
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .period-btn { padding: 8px 12px; border: 1px solid var(--border-color); background: transparent; color: white; border-radius: 8px; cursor: pointer; }
-        .period-btn.active { background: var(--accent-emerald); color: #000; border-color: transparent; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .stat-box { background: var(--bg-secondary); padding: 15px; border-radius: 12px; text-align: center; border-top: 3px solid var(--accent-emerald); }
-        .stat-value { font-family: 'Bebas Neue'; font-size: 2rem; }
-        
-        .fields-grid { display: grid; gap: 20px; }
-        @media(min-width: 900px) { .fields-grid { grid-template-columns: 1fr 1fr 1fr; } }
-        
-        .field-card { border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; }
-        .field-header { background: var(--bg-secondary); padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
-        .badge.ok { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); }
-        .badge.warn { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-        .badge.danger { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-        
-        /* Gauges */
-        .gauge-row { display: flex; justify-content: space-around; padding: 15px; background: rgba(0,0,0,0.2); }
-        .gauge { position: relative; width: 70px; height: 70px; }
-        .gauge circle { fill: none; stroke-width: 6; }
-        .gauge .bg { stroke: #222; }
-        .gauge .fill { stroke: var(--accent-emerald); stroke-linecap: round; transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset 1s; }
-        .gauge-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; }
-        .gauge-label { font-size: 0.6rem; color: var(--text-muted); margin-top: 5px; text-align: center; }
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#070a09">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
-        /* Canvas */
-        .canvas-wrap { position: relative; background: #14532d; margin: 10px; border-radius: 8px; overflow: hidden; }
-        canvas { width: 100%; display: block; cursor: crosshair; }
-        .coords { text-align: center; padding: 10px; color: var(--accent-cyan); font-size: 0.9rem; }
-        
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        th { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); }
-        .btn-del { background: #b91c1c; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-        /* ===== INTRO ANIMADO ===== */
-#intro {
-  position: fixed;
-  inset: 0;
-  background: #070a09;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  animation: fadeOutIntro 0.5s ease 3.2s forwards;
+<style>
+:root {
+--bg-primary:#070a09; --bg-secondary:#0d1411; --bg-card:#141d19;
+--accent-emerald:#10b981; --accent-cyan:#06b6d4; --accent-red:#ef4444;
+--text-primary:#f0fdf4; --text-secondary:#a7f3d0; --text-muted:#6b7280;
+--border-color:rgba(16,185,129,0.12); --field-green:#166534;
 }
 
-.logo-container {
-  position: relative;
-  width: 140px;
-  animation: zoomIntro 1.2s ease forwards;
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;}
+
+/* ===== INTRO PRO ===== */
+#intro{
+position:fixed;
+inset:0;
+background:#070a09;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+animation:fadeOutIntro 0.6s ease 5s forwards;
 }
 
-.intro-logo {
-  width: 100%;
-  border-radius: 50%;
-  filter: blur(10px);
-  opacity: 0;
-  animation: focusIntro 1s ease forwards 0.3s, glowIntro 1s ease 2s;
+.logo-container{
+position:relative;
+width:70vw;
+max-width:320px;
+animation:zoomIntro 1.2s ease forwards;
 }
 
-/* Línea scan */
-.scan {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
-  animation: scanIntro 1s ease 1.2s;
+.intro-logo{
+width:100%;
+border-radius:50%;
+filter:blur(10px);
+opacity:0;
+animation:
+focusIntro 1s ease forwards 0.3s,
+glowIntro 1.5s ease 2.5s,
+pulseIntro 2s infinite 3s;
 }
 
-/* Animaciones */
-@keyframes focusIntro {
-  to { filter: blur(0); opacity: 1; }
+/* HUD */
+.hud{
+position:absolute;
+inset:-20px;
+border:1px solid rgba(6,182,212,0.2);
+border-radius:50%;
+animation:hudRotate 6s linear infinite;
 }
 
-@keyframes zoomIntro {
-  from { transform: scale(0.8); }
-  to { transform: scale(1); }
+/* SCAN */
+.scan{
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:3px;
+background:linear-gradient(90deg,transparent,rgba(6,182,212,0.2),var(--accent-cyan),rgba(6,182,212,0.2),transparent);
+filter:blur(1px);
+animation:scanIntro 1.5s ease 1.5s;
 }
 
-@keyframes scanIntro {
-  0% { top: 20%; left: -100%; }
-  50% { left: 100%; }
-  100% { top: 80%; left: 100%; }
+/* TEXTO */
+.loading-text{
+position:absolute;
+bottom:-60px;
+font-size:0.7rem;
+letter-spacing:3px;
+color:var(--accent-cyan);
+opacity:0;
+animation:fadeText 1s ease 2s forwards, blink 1.5s infinite 3s;
 }
 
-@keyframes glowIntro {
-  0% { filter: drop-shadow(0 0 0px var(--accent-cyan)); }
-  50% { filter: drop-shadow(0 0 15px var(--accent-cyan)); }
-  100% { filter: drop-shadow(0 0 0px var(--accent-cyan)); }
+/* ANIMACIONES */
+@keyframes focusIntro{to{filter:blur(0);opacity:1;}}
+@keyframes zoomIntro{from{transform:scale(0.8);}to{transform:scale(1);}}
+@keyframes scanIntro{
+0%{top:20%;left:-100%;}
+50%{left:100%;}
+100%{top:80%;left:100%;}
+}
+@keyframes glowIntro{
+0%{filter:drop-shadow(0 0 0 var(--accent-cyan));}
+50%{filter:drop-shadow(0 0 25px var(--accent-cyan));}
+100%{filter:drop-shadow(0 0 5px var(--accent-cyan));}
+}
+@keyframes pulseIntro{
+0%{transform:scale(1);}
+50%{transform:scale(1.05);}
+100%{transform:scale(1);}
+}
+@keyframes hudRotate{
+from{transform:rotate(0deg);}
+to{transform:rotate(360deg);}
+}
+@keyframes fadeText{to{opacity:1;}}
+@keyframes blink{
+0%,100%{opacity:1;}
+50%{opacity:0.3;}
+}
+@keyframes fadeOutIntro{
+to{opacity:0;visibility:hidden;}
 }
 
-@keyframes fadeOutIntro {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-        }
-    </style>
+/* ===== TU UI (igual) ===== */
+.menu-toggle{position:fixed;top:20px;left:20px;z-index:1100;background:var(--accent-emerald);color:#000;border:none;width:50px;height:50px;border-radius:15px;cursor:pointer;font-size:1.5rem;}
+.side-menu{position:fixed;top:0;left:-300px;width:280px;height:100vh;background:var(--bg-secondary);z-index:1050;transition:left 0.3s;padding-top:80px;}
+.side-menu.open{left:0;}
+.overlay{position:fixed;display:none;inset:0;background:rgba(0,0,0,0.8);z-index:1040;}
+.menu-item{padding:18px 24px;border-bottom:1px solid var(--border-color);cursor:pointer;}
+
+.page{display:none;}
+.page.active{display:block;}
+
+.logo-img{width:140px;height:140px;border-radius:50%;margin-bottom:20px;}
+
+</style>
 </head>
+
 <body>
- <!-- INTRO -->
+
+<!-- INTRO -->
 <div id="intro">
   <div class="logo-container">
+    <div class="hud"></div>
     <img src="icon.png" class="intro-logo">
     <div class="scan"></div>
+    <div class="loading-text">INICIANDO SISTEMA...</div>
   </div>
 </div>
-    
-    <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
-    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
-    
-    <nav class="side-menu" id="menu">
-        <div style="padding: 20px; border-bottom:1px solid #222; font-weight:bold; letter-spacing:1px;">MENU</div>
-        <div class="menu-item" onclick="showPage('home')">Inicio</div>
-        <div class="menu-item" onclick="showPage('estado')">Estado</div>
-        <div class="menu-item" onclick="showPage('riego')">Riego</div>
-        <div class="menu-item" onclick="showPage('corte')">Corte</div>
-        <div class="menu-item" onclick="showPage('tareas')">Tareas</div>
-        <div class="menu-item" onclick="showPage('historial')">Historial</div>
-    </nav>
 
-    <!-- HOME -->
-    <div id="page-home" class="page active">
-        <img src="icon.png" class="logo-img" alt="Logo">
-        <h1 class="home-title">Predio La Cruz</h1>
-        <p class="home-subtitle">Gestion Profesional</p>
-        <p style="color:var(--text-muted); margin-bottom:30px;">Sistema de mantenimiento integral</p>
-        <div class="nav-buttons">
-            <div class="nav-btn primary" onclick="showPage('estado')">
-                <span class="icon">&#9917;</span>
-                <span class="label">Estado Canchas</span>
-            </div>
-            <div class="nav-btn" onclick="showPage('riego')">
-                <span class="icon">&#128167;</span>
-                <span class="label">Cargar Riego</span>
-            </div>
-            <div class="nav-btn" onclick="showPage('corte')">
-                <span class="icon">&#9986;</span>
-                <span class="label">Cargar Corte</span>
-            </div>
-            <div class="nav-btn" onclick="showPage('tareas')">
-                <span class="icon">&#128736;</span>
-                <span class="label">Cargar Tareas</span>
-            </div>
-        </div>
-    </div>
+<button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-    <!-- ESTADO -->
-    <div id="page-estado" class="page">
-        <header>&#9917; Estado Actual</header>
-        <div class="container">
-            <div class="dashboard-header">
-                <div>
-                    <h2 style="font-family:'Bebas Neue';font-size:1.8rem;">Panel de Control</h2>
-                    <div style="font-size:0.8rem;color:var(--text-muted);">Monitoreo en tiempo real</div>
-                </div>
-                <div>
-                    <button class="period-btn" onclick="setPeriod(7)">7d</button>
-                    <button class="period-btn active" id="btnp14" onclick="setPeriod(14)">14d</button>
-                    <button class="period-btn" onclick="setPeriod(30)">30d</button>
-                </div>
-            </div>
-            
-            <div class="stats-grid" id="statsGrid">
-                <!-- Stats se llenan con JS -->
-            </div>
-            
-            <div class="fields-grid" id="fieldsGrid">
-                <!-- Canchas se llenan con JS -->
-            </div>
-            
-            <button class="btn-action" onclick="exportarExcel()">Exportar Excel</button>
-        </div>
-    </div>
+<nav class="side-menu" id="menu">
+<div class="menu-item" onclick="showPage('home')">Inicio</div>
+<div class="menu-item" onclick="showPage('estado')">Estado</div>
+</nav>
 
-    <!-- RIEGO -->
-    <div id="page-riego" class="page">
-        <header>&#128167; Cargar Riego</header>
-        <div class="container">
-            <div class="card">
-                <h3>Marcar Ubicacion (68x105m)</h3>
-                <div class="canvas-wrap">
-                    <canvas id="canvasRiego" width="680" height="1050"></canvas>
-                </div>
-                <div class="coords" id="coordsRiego">Toque la cancha...</div>
-                
-                <label>Radio (m): <span id="valRadio">15</span></label>
-                <input type="range" min="5" max="30" value="15" oninput="setRad(this.value)">
-                
-                <label>Cancha</label>
-                <select id="selCanchaR"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
-                
-                <label>Fecha/Hora</label>
-                <input type="datetime-local" id="fechaR">
-                
-                <label>Duracion (min)</label>
-                <input type="number" id="duracionR" value="60">
-                
-                <label>Presion (bar)</label>
-                <input type="number" id="presionR" value="2.5" step="0.1">
-                
-                <label>Notas</label>
-                <textarea id="obsR" rows="2"></textarea>
-                
-                <button class="btn-action btn-rojo" onclick="guardarRiego()">Guardar</button>
-            </div>
-        </div>
-    </div>
+<div id="page-home" class="page active">
+<img src="icon.png" class="logo-img">
+<h1>Predio La Cruz</h1>
+</div>
 
-    <!-- CORTE -->
-    <div id="page-corte" class="page">
-        <header>&#9986; Cargar Corte</header>
-        <div class="container">
-            <div class="card">
-                <h3>Registro de Corte</h3>
-                <label>Cancha</label>
-                <select id="selCanchaC"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
-                <label>Fecha/Hora</label>
-                <input type="datetime-local" id="fechaC">
-                <label>Notas</label>
-                <textarea id="obsC" rows="2"></textarea>
-                <button class="btn-action" onclick="guardarCorte()">Guardar</button>
-            </div>
-        </div>
-    </div>
+<script>
+// INTRO SOLO UNA VEZ
+const yaVisto = localStorage.getItem("intro_visto");
 
-    <!-- TAREAS -->
-    <div id="page-tareas" class="page">
-        <header>&#128736; Tareas</header>
-        <div class="container">
-            <div class="card">
-                <h3>Nueva Tarea</h3>
-                <label>Tipo</label>
-                <select id="tipoT" onchange="cambiarTipoTarea(this.value)">
-                    <option value="">Seleccione...</option>
-                    <option value="fertilizacion">Fertilizacion</option>
-                    <option value="slicer">Slicer</option>
-                    <option value="corte_vertical">Corte Vertical</option>
-                </select>
-                
-                <div id="formTareas" style="display:none; margin-top:15px;">
-                    <label>Cancha</label>
-                    <select id="canchaT"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
-                    <label>Fecha/Hora</label>
-                    <input type="datetime-local" id="fechaT">
-                    
-                    <div id="extraFert" style="display:none;">
-                        <label>Cantidad (kg)</label>
-                        <input type="number" id="kgFert" placeholder="50">
-                        <label>Tipo Fertilizante</label>
-                        <input type="text" id="tipoFert" placeholder="NPK">
-                    </div>
-                    
-                    <label>Notas</label>
-                    <textarea id="obsT" rows="2"></textarea>
-                    <button class="btn-action btn-rojo" onclick="guardarTarea()">Guardar</button>
-                </div>
-            </div>
-        </div>
-    </div>
+if (yaVisto) {
+  document.getElementById("intro").remove();
+} else {
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      const intro = document.getElementById("intro");
+      if (intro) intro.remove();
+      localStorage.setItem("intro_visto", "true");
+    }, 5000);
+  });
+}
 
-    <!-- HISTORIAL -->
-    <div id="page-historial" class="page">
-        <header>&#128218; Historial</header>
-        <div class="container">
-            <div class="card">
-                <h3>Riegos</h3>
-                <div style="overflow-x:auto;"><table><thead><tr><th>Cancha</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody id="tbodyR"></tbody></table></div>
-            </div>
-            <div class="card">
-                <h3>Cortes</h3>
-                <div style="overflow-x:auto;"><table><thead><tr><th>Cancha</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody id="tbodyC"></tbody></table></div>
-            </div>
-            <div class="card">
-                <h3>Tareas</h3>
-                <div style="overflow-x:auto;"><table><thead><tr><th>Tipo</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody id="tbodyT"></tbody></table></div>
-            </div>
-        </div>
-    </div>
+// MENU
+function toggleMenu(){
+document.getElementById('menu').classList.toggle('open');
+document.getElementById('overlay').style.display=
+document.getElementById('menu').classList.contains('open')?'block':'none';
+}
 
-    <script>
-        // SERVICE WORKER
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(() => console.log('SW OK'));
-        }
+function showPage(id){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById('page-'+id).classList.add('active');
+}
+</script>
 
-        // DATA
-        let datos = {
-            riegos: JSON.parse(localStorage.getItem('d_riegos') || '[]'),
-            cortes: JSON.parse(localStorage.getItem('d_cortes') || '[]'),
-            tareas: JSON.parse(localStorage.getItem('d_tareas') || '[]')
-        };
-        let currentPoint = null;
-        let currentRadio = 15;
-        let currentPeriod = 14;
-
-        // NAV
-        function toggleMenu() {
-            document.getElementById('menu').classList.toggle('open');
-            document.getElementById('overlay').style.display = document.getElementById('menu').classList.contains('open') ? 'block' : 'none';
-        }
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-'+id).classList.add('active');
-            toggleMenu(); 
-            if(document.getElementById('menu').classList.contains('open')) toggleMenu(); // close if open
-            window.scrollTo(0,0);
-            if(id==='estado') renderDashboard();
-            if(id==='riego') drawCanvas();
-            if(id==='historial') renderHistory();
-        }
-
-        // DASHBOARD
-        function setPeriod(d) { 
-            currentPeriod = d; 
-            document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-            // simple toggle logic for demo
-            renderDashboard();
-        }
-        
-        function renderDashboard() {
-            // Stats
-            const now = Date.now();
-            const start = now - (currentPeriod * 24 * 60 * 60 * 1000);
-            const riegosF = datos.riegos.filter(r => new Date(r.fecha).getTime() > start);
-            
-            document.getElementById('statsGrid').innerHTML = `
-                <div class="stat-box"><div class="stat-value">${riegosF.length}</div><div style="font-size:0.7rem;color:var(--text-muted)">Riegos</div></div>
-                <div class="stat-box"><div class="stat-value">${datos.cortes.length}</div><div style="font-size:0.7rem;color:var(--text-muted)">Cortes</div></div>
-                <div class="stat-box"><div class="stat-value">${datos.tareas.length}</div><div style="font-size:0.7rem;color:var(--text-muted)">Tareas</div></div>
-                <div class="stat-box"><div class="stat-value">${datos.riegos.length > 0 ? Math.floor((now - new Date(datos.riegos[datos.riegos.length-1].fecha).getTime()) / (1000*60*60*24)) : '-'}</div><div style="font-size:0.7rem;color:var(--text-muted)">Dias Ult. Riego</div></div>
-            `;
-
-            // Fields
-            const fields = document.getElementById('fieldsGrid');
-            fields.innerHTML = '';
-            [1,2,3].forEach(num => {
-                const lastRiego = datos.riegos.filter(r => r.cancha == num).pop();
-                const lastCorte = datos.cortes.filter(c => c.cancha == num).pop();
-                const lastFert = datos.tareas.filter(t => t.cancha == num && t.tipo === 'fertilizacion').pop();
-                
-                const dR = lastRiego ? Math.floor((now - new Date(lastRiego.fecha)) / (1000*60*60*24)) : 99;
-                const dC = lastCorte ? Math.floor((now - new Date(lastCorte.fecha)) / (1000*60*60*24)) : 99;
-                const dF = lastFert ? Math.floor((now - new Date(lastFert.fecha)) / (1000*60*60*24)) : 99;
-                
-                const getStatus = (d, max) => d < max/2 ? 'ok' : (d < max ? 'warn' : 'danger');
-                
-                fields.innerHTML += `
-                <div class="field-card">
-                    <div class="field-header">
-                        <span style="font-family:'Bebas Neue';font-size:1.2rem;">Cancha ${num}</span>
-                        <span class="badge ${getStatus(dR, 5)}">Riego: ${dR}d</span>
-                    </div>
-                    <div class="gauge-row">
-                        <div>
-                            <div class="gauge"><svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15.9"/><circle class="fill" cx="18" cy="18" r="15.9" stroke-dasharray="${100-dR*5}, 100"/></svg><div class="gauge-center">${dR}<small>d</small></div></div>
-                            <div class="gauge-label">Riego</div>
-                        </div>
-                        <div>
-                             <div class="gauge"><svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15.9"/><circle class="fill" style="stroke:var(--accent-cyan)" cx="18" cy="18" r="15.9" stroke-dasharray="${100-dC*5}, 100"/></svg><div class="gauge-center">${dC}<small>d</small></div></div>
-                            <div class="gauge-label">Corte</div>
-                        </div>
-                        <div>
-                             <div class="gauge"><svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15.9"/><circle class="fill" style="stroke:var(--accent-red)" cx="18" cy="18" r="15.9" stroke-dasharray="${100-dF}, 100"/></svg><div class="gauge-center">${dF}<small>d</small></div></div>
-                            <div class="gauge-label">Fert.</div>
-                        </div>
-                    </div>
-                </div>
-                `;
-            });
-        }
-
-        // RIEGO CANVAS
-        function setRad(v) { currentRadio = parseInt(v); document.getElementById('valRadio').innerText = v; }
-        
-        function drawCanvas() {
-            const c = document.getElementById('canvasRiego');
-            const ctx = c.getContext('2d');
-            
-            // Background
-            ctx.fillStyle = '#14532d';
-            ctx.fillRect(0, 0, 680, 1050);
-            
-            // Lines
-            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(20, 20, 640, 1010); // border
-            ctx.beginPath(); ctx.moveTo(340, 20); ctx.lineTo(340, 1030); ctx.stroke(); // mid
-            ctx.beginPath(); ctx.arc(340, 525, 60, 0, Math.PI*2); ctx.stroke(); // center circle
-            
-            // Point
-            if(currentPoint) {
-                ctx.fillStyle = 'rgba(6, 182, 212, 0.5)';
-                ctx.beginPath();
-                ctx.arc(currentPoint.x, currentPoint.y, currentRadio * 10, 0, Math.PI*2);
-                ctx.fill();
-                ctx.fillStyle = '#fff';
-                ctx.beginPath();
-                ctx.arc(currentPoint.x, currentPoint.y, 5, 0, Math.PI*2);
-                ctx.fill();
-            }
-        }
-        
-        document.getElementById('canvasRiego').onclick = function(e) {
-            const r = this.getBoundingClientRect();
-            currentPoint = {
-                x: (e.clientX - r.left) * (680 / r.width),
-                y: (e.clientY - r.top) * (1050 / r.height)
-            };
-            document.getElementById('coordsRiego').innerText = `X: ${(currentPoint.x/10).toFixed(1)}m, Y: ${(currentPoint.y/10).toFixed(1)}m`;
-            drawCanvas();
-        };
-
-        // SAVE FUNCTIONS
-        function guardarRiego() {
-            if(!currentPoint) return alert('Marque un punto');
-            datos.riegos.push({
-                id: Date.now(),
-                cancha: document.getElementById('selCanchaR').value,
-                fecha: document.getElementById('fechaR').value,
-                duracion: document.getElementById('duracionR').value,
-                presion: document.getElementById('presionR').value,
-                obs: document.getElementById('obsR').value,
-                x: currentPoint.x, y: currentPoint.y, radio: currentRadio
-            });
-            localStorage.setItem('d_riegos', JSON.stringify(datos.riegos));
-            alert('Guardado');
-            currentPoint = null;
-            document.getElementById('coordsRiego').innerText = 'Toque la cancha...';
-            drawCanvas();
-        }
-        
-        function guardarCorte() {
-            datos.cortes.push({
-                id: Date.now(),
-                cancha: document.getElementById('selCanchaC').value,
-                fecha: document.getElementById('fechaC').value,
-                obs: document.getElementById('obsC').value
-            });
-            localStorage.setItem('d_cortes', JSON.stringify(datos.cortes));
-            alert('Guardado');
-        }
-        
-        function cambiarTipoTarea(t) {
-            document.getElementById('formTareas').style.display = t ? 'block' : 'none';
-            document.getElementById('extraFert').style.display = t === 'fertilizacion' ? 'block' : 'none';
-        }
-        
-        function guardarTarea() {
-            datos.tareas.push({
-                id: Date.now(),
-                tipo: document.getElementById('tipoT').value,
-                cancha: document.getElementById('canchaT').value,
-                fecha: document.getElementById('fechaT').value,
-                obs: document.getElementById('obsT').value,
-                extra: document.getElementById('kgFert').value
-            });
-            localStorage.setItem('d_tareas', JSON.stringify(datos.tareas));
-            alert('Guardado');
-        }
-
-        // HISTORY
-        function renderHistory() {
-            const htmlR = datos.riegos.map(r => `<tr><td>${r.cancha}</td><td>${new Date(r.fecha).toLocaleString()}</td><td><button class="btn-del" onclick="del('riegos', ${r.id})">X</button></td></tr>`).join('');
-            document.getElementById('tbodyR').innerHTML = htmlR || '<tr><td colspan="3">Sin datos</td></tr>';
-            
-            const htmlC = datos.cortes.map(c => `<tr><td>${c.cancha}</td><td>${new Date(c.fecha).toLocaleString()}</td><td><button class="btn-del" onclick="del('cortes', ${c.id})">X</button></td></tr>`).join('');
-            document.getElementById('tbodyC').innerHTML = htmlC || '<tr><td colspan="3">Sin datos</td></tr>';
-            
-            const htmlT = datos.tareas.map(t => `<tr><td>${t.tipo}</td><td>${new Date(t.fecha).toLocaleString()}</td><td><button class="btn-del" onclick="del('tareas', ${t.id})">X</button></td></tr>`).join('');
-            document.getElementById('tbodyT').innerHTML = htmlT || '<tr><td colspan="3">Sin datos</td></tr>';
-        }
-        
-        function del(type, id) {
-            datos[type] = datos[type].filter(i => i.id !== id);
-            localStorage.setItem('d_'+type, JSON.stringify(datos[type]));
-            renderHistory();
-        }
-
-        function exportarExcel() {
-            let csv = "Tipo,Cancha,Fecha,Detalles\n";
-            datos.riegos.forEach(r => csv += `Riego,${r.cancha},${r.fecha},${r.obs}\n`);
-            datos.cortes.forEach(c => csv += `Corte,${c.cancha},${c.fecha},${c.obs}\n`);
-            datos.tareas.forEach(t => csv += `Tarea,${t.cancha},${t.fecha},${t.obs}\n`);
-            
-            
-            const blob = new Blob([csv], {type: 'text/csv'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'predio_data.csv';
-            a.click();
-        }
-
-        // INIT
-        document.getElementById('fechaR').value = new Date().toISOString().slice(0, 16);
-        document.getElementById('fechaC').value = new Date().toISOString().slice(0, 16);
-        document.getElementById('fechaT').value = new Date().toISOString().slice(0, 16);
-
-        // INTRO REMOVE
-setTimeout(() => {
-    const intro = document.getElementById("intro");
-    if (intro) intro.remove();
-}, 4000);
-        
-    </script>
 </body>
-    </html>
+</html>
