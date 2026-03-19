@@ -1,4 +1,4 @@
-const CACHE_NAME = 'predio-v1';
+const CACHE_NAME = 'predio-v4';
 const ASSETS = ['index.html', 'icon.png'];
 
 self.addEventListener('install', e => {
